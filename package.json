@@ -1,0 +1,39 @@
+{
+  "name": "voobly-scraper",
+  "version": "1.0.0",
+  "description": "Scrape and download match recordings from voobly site",
+  "main": "config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/islamz1214/voobly-scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/islamz1214/voobly-scraper/issues"
+  },
+  "homepage": "https://github.com/islamz1214/voobly-scraper#readme",
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "dotenv": "^8.2.0",
+    "jsdom": "^16.4.0",
+    "nightmare": "^3.0.2",
+    "nyc": "^15.1.0",
+    "tap": "^14.11.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "standard": "^16.0.3"
+  }
+}
