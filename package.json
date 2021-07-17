@@ -1,39 +1,27 @@
 {
-  "name": "voobly-scraper",
+  "name": "voobly-rec-scraper",
   "version": "1.0.0",
-  "description": "Scrape and download match recordings from voobly site",
-  "main": "config.js",
-  "directories": {
-    "test": "test"
-  },
+  "description": "README.md",
+  "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter spec"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/islamz1214/voobly-scraper.git"
+    "url": "git+https://github.com/islamz1214/voobly-rec-   scraper.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/islamz1214/voobly-scraper/issues"
+    "url": "https://github.com/islamz1214/voobly-rec-scraper/issues"
   },
-  "homepage": "https://github.com/islamz1214/voobly-scraper#readme",
+  "homepage": "https://github.com/islamz1214/voobly-rec-scraper#readme",
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
-    "dotenv": "^8.2.0",
-    "jsdom": "^16.4.0",
     "nightmare": "^3.0.2",
-    "nyc": "^15.1.0",
-    "tap": "^14.11.0"
+    "unzipper": "^0.10.11"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.12.10",
-    "@babel/plugin-transform-modules-commonjs": "^7.12.1",
-    "@babel/preset-env": "^7.12.11",
-    "chai": "^4.2.0",
-    "mocha": "^8.2.1",
+    "dotenv": "^10.0.0",
     "standard": "^16.0.3"
   }
 }
