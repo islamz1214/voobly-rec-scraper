@@ -12,7 +12,7 @@ Create a .env file in the root directory and paste the following:
 
     VOOBLY_USERNAME=[your-voobly-username]
     VOOBLY_PASSWORD=[your-voobly-password]
-    DOWNLOADS_PATH=[absolute-path-to-downloads-folder-ending-with-forward-slash]
+    DOWNLOADS_PATH=[ex. /home/zahidulislam/Desktop/voobly-rec-scraper/downloads/]
     
 ## Run
 
@@ -23,4 +23,4 @@ $ node index.js
 
 ## Results
 
-Check the downloads folder for the .rcx file.
+Check the downloads folder for the .rcx files.
