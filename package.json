@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/islamz1214/voobly-rec-scraper#readme",
   "dependencies": {
+    "fs": "0.0.1-security",
     "nightmare": "^3.0.2",
     "unzipper": "^0.10.11"
   },
