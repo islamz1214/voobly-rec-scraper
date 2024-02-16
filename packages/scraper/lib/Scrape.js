@@ -1,24 +1,25 @@
-  function getPlayerOneName () {
-    return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
-  }
+console.log('debug123')
+  export default class Scrape {
+    getPlayerOneName () {
+      return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
+    }
+    getPlayerTwoName () {
+      return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(3) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
+    }
 
-  function getPlayerTwoName () {
-    return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(3) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
-  }
+    getPlayerOneGod () {
+        const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > img').attributes[0].value
+        const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
+        return pickGod(godNum)
+      }
 
-  function getPlayerOneGod () {
-    const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > img').attributes[0].value
-    const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
-    return pickGod(godNum)
-  }
+    getPlayerTwoGod () {
+      const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(3) > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > img').attributes[0].value
+      const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
+      return pickGod(godNum)
+    }
 
-  function getPlayerTwoGod () {
-    const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(3) > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > img').attributes[0].value
-    const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
-    return pickGod(godNum)
-  }
-
-  function getPatch () {
+ getPatch () {
     const gameLadderSelector = document.querySelector('#content > div.left-column > table > tbody > tr > td:nth-child(2) > a')
     const gameTypeSelector = document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(2)')
 
@@ -29,7 +30,7 @@
     }
   }
 
-  function getMap () {
+ getMap () {
     const mapElement = document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(5) > td:nth-child(2)').innerHTML
 
     if (mapElement === 'n/a') {
@@ -39,7 +40,7 @@
     }
   }
 
-  function getDate () {
+   getDate () {
     const date = new Date()
     const month = date.getMonth() + 1
     const day = date.getDate()
@@ -56,7 +57,7 @@
     }
   }
 
-  function getFilename () {
+  getFilename  () {
     return 'W_' + getPlayerOneName() +
                 '(' + getPlayerOneGod() +
                 ')_vs_' + getPlayerTwoName() +
@@ -65,7 +66,7 @@
                 '_' + getDate() + '.zip'
   }
 
-  function getRcxFileUrl () {
+  getRcxFileUrl () {
     if (document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(2) > td').innerHTML === 'No recordings found') {
       return false
     } else {
@@ -73,7 +74,7 @@
     }
   }
 
-  function getMonthNumber (monthName) {
+   getMonthNumber (monthName) {
     switch (monthName) {
       case 'January':
         return '01'
@@ -104,7 +105,7 @@
     }
   }
 
-  function pickGod (num) {
+  pickGod (num) {
     switch (num) {
       case '0':
         return 'Zeus'
@@ -134,8 +135,33 @@
         return 'pickGodError'
     }
   }
+  }
+  
+
+  const s = new Scrape()
 
   return {
-    filename: getFilename(),
-    url: getRcxFileUrl()
+    filename: s.getFilename(),
+    url: s.getRcxFileUrl()
   }
+
+
+  /*
+  export {
+    getFilename,
+    getRcxFileUrl,
+    getPlayerOneName,
+    getPlayerTwoName,
+    getPlayerOneGod,
+    getPlayerTwoGod,
+    getPatch,
+    getMap,
+    getDate,
+    getFilename,
+    getRcxFileUrl,
+    getMonthNumber,
+    pickGod
+  }*/
+
+
+  

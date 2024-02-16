@@ -2,42 +2,40 @@ const t = require('tap');
 const assert = require('assert');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-const { scraper } = require("../src/lib/scraper.js");
-
-console.log('checkpoint')
+const { scrape } = require("../lib/Scrape.js");
 
 let document;
 async function regularDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/match.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
 async function noRecsFoundDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/no_recs_found.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
 async function noPatchDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/no_patch.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
 async function noMapDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/no_patch.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
 async function matchTodayDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/match_today.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
 async function matchOldDocument() {
     const dom = await JSDOM.fromFile(process.cwd() + '/test/data/match_old.html');
-    return document = scraper(dom.window.document);
+    return document = scrape(dom.window.document);
 }
 
-t.test('scraper', async function() {
+t.test('scrape', async function() {
 
     const doc = await regularDocument();
     const noRecsFoundDoc = await noRecsFoundDocument();

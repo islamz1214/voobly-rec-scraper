@@ -1,5 +1,5 @@
 const t = require('tap');
-const util = require('../src/lib/util');
+const util = require('../lib/util');
 
 t.test('getMonthNumber', async function() {
     
