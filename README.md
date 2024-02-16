@@ -2,7 +2,7 @@
 
 Scrape and download .rcx files from voobly site.
 
-Currently it's tailored to Age of Mythology Titans Expansion, top 10, 1v1 supremecy, expert replays.
+Currently it's tailored to 1V1 expert replays for Age of Mythology Titans Expansion.
 
 ## Setup
 
@@ -12,7 +12,7 @@ Create a .env file in the root directory and paste the following:
 
     VOOBLY_USERNAME=[your-voobly-username]
     VOOBLY_PASSWORD=[your-voobly-password]
-    DOWNLOADS_PATH=[absolute-path-to-downloads-folder-ending-with-forward-slash]
+    DOWNLOADS_PATH=[ex. /home/zahidulislam/Desktop/voobly-rec-scraper/downloads/]
     
 ## Run
 
@@ -23,4 +23,12 @@ $ node index.js
 
 ## Results
 
-Check the downloads folder for the .rcx file.
+Check the downloads folder for the .rcx files.
+
+## Extra
+
+The following service can GET the rec files:
+- https://github.com/islamz1214/voobly-rec-server
+
+The following service can DISPLAY the rec files:
+- https://github.com/islamz1214/voobly-rec-vue
