@@ -1,37 +1,48 @@
-console.log('debug123')
-  export default class Scrape {
-    getPlayerOneName () {
-      return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
-    }
-    getPlayerTwoName () {
-      return document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(3) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child').innerHTML
-    }
+module.exports = async (page) => {
+  async function getText (selector) {
+    return await page.$eval(selector, el => el.innerHTML);
+  }
 
-    getPlayerOneGod () {
-        const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > img').attributes[0].value
-        const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
-        return pickGod(godNum)
-      }
+  async function getHref (selector) {
+    return await page.$eval(selector, el => el.href);
+  }
 
-    getPlayerTwoGod () {
-      const src = document.querySelector('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(3) > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > img').attributes[0].value
-      const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
-      return pickGod(godNum)
-    }
+  async function getAttribute (selector) {
+    return await page.$eval(selector, el => el.attributes[0].value)
+  }
 
- getPatch () {
-    const gameLadderSelector = document.querySelector('#content > div.left-column > table > tbody > tr > td:nth-child(2) > a')
-    const gameTypeSelector = document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(2)')
+  async function getPlayerOneName () {
+    return await getText('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child')
+  }
+
+  async function getPlayerTwoName () {
+    return await getText('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(3) > td:nth-child(1) > table > tbody > tr > td:nth-child(3) a:last-child')
+  }
+  async function getPlayerOneGod () {
+    const src = await getAttribute('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) > img', 'img', 'src')
+    const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
+    return pickGod(godNum)
+  }
+
+  async function getPlayerTwoGod () {
+    const src = await getAttribute('#tab-content > div > table:nth-child(4) > tbody > tr > td:nth-child(3) > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) > img', 'img', 'src')
+    const godNum = src.substring(src.lastIndexOf('/') + 1, src.lastIndexOf('.'))
+    return pickGod(godNum)
+  }
+
+  async function getPatch () {
+    const gameLadderSelector = await getText('#content > div.left-column > table > tbody > tr > td:nth-child(2) > a')
+    const gameTypeSelector = await getText('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(8) > td:nth-child(2)')
 
     if (gameLadderSelector === '1v1 Supremacy' || gameTypeSelector != null) {
-      return gameTypeSelector.innerHTML
+      return gameTypeSelector
     } else {
       return 'none'
     }
   }
 
- getMap () {
-    const mapElement = document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(5) > td:nth-child(2)').innerHTML
+  async function getMap () {
+    const mapElement = await getText('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(5) > td:nth-child(2)')
 
     if (mapElement === 'n/a') {
       return 'n_a'
@@ -40,12 +51,13 @@ console.log('debug123')
     }
   }
 
-   getDate () {
+  async function getDate () {
     const date = new Date()
     const month = date.getMonth() + 1
     const day = date.getDate()
     const year = date.getFullYear()
-    let dateElement = document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2)').innerHTML
+    let dateElement = await getText('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2)')
+
     console.log('debug date: ' + dateElement)
     if (dateElement.includes('ago') || dateElement.includes('Today')) {
       return month + '_' + day + '_' + year
@@ -57,24 +69,25 @@ console.log('debug123')
     }
   }
 
-  getFilename  () {
-    return 'W_' + getPlayerOneName() +
-                '(' + getPlayerOneGod() +
-                ')_vs_' + getPlayerTwoName() +
-                '(' + getPlayerTwoGod() + ')_' +
-                getPatch() + '_' + getMap() +
-                '_' + getDate() + '.zip'
+  async function getFilename () {
+    return 'W_' + await getPlayerOneName() +
+                '(' + await getPlayerOneGod() +
+                ')_vs_' + await getPlayerTwoName() +
+                '(' + await getPlayerTwoGod() + ')_' +
+                await getPatch() + '_' + await getMap() +
+                '_' + await getDate() + '.zip'
   }
 
-  getRcxFileUrl () {
-    if (document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(2) > td').innerHTML === 'No recordings found') {
+  async function getRcxFileUrl () {
+    const rcx = await getText('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(2) > td')
+    if (rcx === 'No recordings found') {
       return false
     } else {
-      return document.querySelector('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(3) > td > a').href
+      return await getHref('#tab-content > div > table:nth-child(2) > tbody > tr > td:nth-child(3) > table > tbody > tr:nth-child(3) > td > a')
     }
   }
 
-   getMonthNumber (monthName) {
+  function getMonthNumber (monthName) {
     switch (monthName) {
       case 'January':
         return '01'
@@ -105,7 +118,7 @@ console.log('debug123')
     }
   }
 
-  pickGod (num) {
+  function pickGod (num) {
     switch (num) {
       case '0':
         return 'Zeus'
@@ -135,33 +148,9 @@ console.log('debug123')
         return 'pickGodError'
     }
   }
-  }
-  
-
-  const s = new Scrape()
 
   return {
-    filename: s.getFilename(),
-    url: s.getRcxFileUrl()
+    filename: await getFilename(),
+    url: await getRcxFileUrl()
   }
-
-
-  /*
-  export {
-    getFilename,
-    getRcxFileUrl,
-    getPlayerOneName,
-    getPlayerTwoName,
-    getPlayerOneGod,
-    getPlayerTwoGod,
-    getPatch,
-    getMap,
-    getDate,
-    getFilename,
-    getRcxFileUrl,
-    getMonthNumber,
-    pickGod
-  }*/
-
-
-  
+}

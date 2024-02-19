@@ -1,77 +1,71 @@
-require('dotenv').config()
+(async () => {
+  const puppeteer = require('puppeteer')
+  const scrape = require('./scrape.js')
+  const request = require('request')
+  const fs = require('fs')
 
-const Nightmare = require('nightmare')
-const nightmare = Nightmare({
-  show: true
-})
-const fs = require('fs')
-const request = require('request')
-const results = []
-const maxPlayers = 10
-let playerX = 0
+  const results = []
+  const maxPlayers = 10
+  let playerX = 0
 
-/**
- *
- * Login to voobly
- *
- */
+  const browser = await puppeteer.launch({ headless: false, executablePath: 'google-chrome-stable'})
+  const page = await browser.newPage()
+  await page.setViewport({ width: 1920, height: 1024 })
 
-login()
-function login () {
-  return nightmare
-    .goto('https://www.voobly.com/ladder/view/Age-of-Mythology-The-Titans/1v1-Supremacy')
-    .type('#username', process.env.VOOBLY_USERNAME)
-    .type('#password', process.env.VOOBLY_PASSWORD)
-    .click('.login-button')
-    .then(() => {
-      nextPlayer()
+  // Navigate the page to a URL
+  await page.goto('https://www.voobly.com/ladder/view/Age-of-Mythology-The-Titans/1v1-Supremacy')
+
+  // Type into search box
+  await page.waitForSelector('#username')
+  await page.type('#username', process.env.VOOBLY_USERNAME)
+  await page.waitForSelector('#password')
+  await page.type('#password', process.env.VOOBLY_PASSWORD)
+  await page.waitForSelector('.login-button')
+  await page.click('.login-button')
+  await nextPlayer()
+
+  function delay (time) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, time)
     })
-    .catch((err) => {
-      console.log(err)
-    })
-}
+  }
 
-/**
+  /**
  *
  * Go to player X
  *
  */
-function nextPlayer () {
-  function incrementPlayer () {
-    return 2 + playerX++
-  }
-  return nightmare
-    // 1v1 main page
-    .wait(3000)
-    .goto('https://www.voobly.com/ladder/view/Age-of-Mythology-The-Titans/1v1-Supremacy')
-    .wait('#pagebrowser1 > div.comments > table > tbody', 3000)
-    // Click Player x
-    .click('#pagebrowser1 > div.comments > table > tbody > tr:nth-child(' + incrementPlayer() + ') > td:nth-child(2) a:last-child')
-    .wait('#tabbar > div:nth-child(5)')
-    // Click Matches
-    .click('#tabbar > div:nth-child(5) > a')
-    .url()
-    .then((url) => {
-      scrapeMatches(url)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-}
+  async function nextPlayer () {
+    function incrementPlayer () {
+      return 2 + playerX++
+    }
 
-/**
+    await delay(3000)
+    // 1v1 main page
+    await page.goto('https://www.voobly.com/ladder/view/Age-of-Mythology-The-Titans/1v1-Supremacy')
+    // Click Player x
+    await page.waitForSelector('#pagebrowser1 > div.comments > table > tbody', 3000)
+    await page.click('#pagebrowser1 > div.comments > table > tbody > tr:nth-child(' + incrementPlayer() + ') > td:nth-child(2) a:last-child')
+    await page.waitForSelector('#tabbar > div:nth-child(5)')
+    // Click Matches
+    await page.click('#tabbar > div:nth-child(5) > a')
+    const url = page.url()
+    await scrapeMatches(url)
+  }
+
+  /**
  *
  * Go through all matches for player x and page 1
  * And gather data for download
  * @param {type} url The url to player X
  *
  */
-function scrapeMatches (url) {
-  let increment = 0
+  async function scrapeMatches (url) {
+    let increment = 0
 
-  const matchUrls = Array(10).fill(url)
-  const matchPromise = matchUrls.reduce(function (acc, matchURL) {
-    return acc.then(() => {
+    const matchUrls = Array(maxPlayers.length).fill(url)
+
+    for (let i = 0; i < matchUrls.length; i++) {
       /**
        *
        * Go through all match links and capture link and metadata per qualifed match
@@ -82,47 +76,39 @@ function scrapeMatches (url) {
         return 2 + increment++
       }
 
-      return nightmare
-        .goto(matchURL)
-        .wait('#pagebrowser1 > div.comments > table > tbody')
-        .click('#pagebrowser1 > div.comments > table > tbody > tr:nth-child(' + incrementMatch() + ') > td:nth-child(6) > a:last-child')
-        .wait('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr')
-        .evaluate(() => {
-          const selector = document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr').innerHTML
-          return !selector.includes('<b>')
-        })
+      await page.goto(matchUrls[i])
+      await page.waitForSelector('#pagebrowser1 > div.comments > table > tbody')
+      await page.click('#pagebrowser1 > div.comments > table > tbody > tr:nth-child(' + incrementMatch() + ') > td:nth-child(6) > a:last-child')
+      await page.waitForSelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr')
+      const is1v1 = await page.evaluate(() => {
+        const selector = document.querySelector('#tab-content > div > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr').innerHTML
+        return !selector.includes('<b>')
+      })
 
-        .then((is1v1) => {
-          if (is1v1) {
-            return nightmare
-              .inject('js', './lib/Scrape.js')
-              .then(function (file) {
-                console.log('debug file: ' + JSON.stringify(file))
-                results.push(file)
-                return results
-              })
-              .catch((error) => {
-                console.log(error)
-                nightmare.halt()
-              })
-          }
-        })
-    })
-  }, Promise.resolve())
-  matchPromise.then(() => {
-    /**
-     *
-     * Download all qualified matches for Player X
-     *
-     */
-    for (let i = 0; i < results.length; i++) {
-      if (results[i].url !== false && results[i].filename !== false) {
-        console.log('url: ' + results[i].url)
-        console.log('filename: ' + results[i].filename)
-
-        download(results[i].url, process.env.DOWNLOADS_PATH + results[i].filename, function () { })
+      if (is1v1) {
+        scrape(page)
+          .then(function (file) {
+            results.push(file)
+            return results
+          })
+          .catch((error) => {
+            console.log(error)
+            // nightmare.halt()
+          })
       }
     }
+
+
+
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].url !== false && results[i].filename !== false) {
+          console.log('url: ' + results[i].url)
+          console.log('filename: ' + results[i].filename)
+
+          download(results[i].url, process.env.DOWNLOADS_PATH + results[i].filename, function () { })
+        }
+      }
+   
 
     /**
      *
@@ -132,29 +118,31 @@ function scrapeMatches (url) {
     if (playerX < maxPlayers) {
       nextPlayer()
     } else {
-      return nightmare.end()
+      browser.close()
     }
-  })
+  }
 
-  matchPromise.catch((error) => {
-    console.log(error)
-  })
-}
-
-/**
+  /**
  *
- * Download process
+ * TODO - Download zip file, unzip it, then provide new filename
+ *
+ * Download zip file
  *
  * @param {*} url The url for download
  * @param {*} filename The descriptive filename
  * @param {*} callback Close fs
  */
-function download (url, filename, callback) {
-  request.head(url, function (error, response, body) {
-    if (error) {
-      console.error(error)
-    } else {
+  function download (url, filename, callback) {
+  // const newFilename = (filename.substring(0, filename.length - 3)).concat('rcx')
+
+    request.head(url, function (error, response, body) {
+      if (error) {
+        console.error(error)
+      } else {
+      // request(url).pipe(unzipper.Extract({ path: newFilename })).on('close', callback)
+      console.log('debug fuilenane: ' + filename)  
       request(url).pipe(fs.createWriteStream(filename)).on('close', callback)
-    }
-  })
-}
+      }
+    })
+  }
+})()

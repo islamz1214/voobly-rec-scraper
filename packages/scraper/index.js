@@ -1,1 +1,2 @@
-module.exports = require('./lib/scraper');
+console.log('debuggg')
+module.exports = require('./lib/scraper')
